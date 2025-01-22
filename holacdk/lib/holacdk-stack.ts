@@ -23,7 +23,11 @@ export class HolacdkStack extends Stack {
     };
 
     // Creación del bucket
-    const newBucket = new Bucket(this, 'MyFirstBucket', bucketProps);
+    const newBucket = new Bucket(this, 'MyFirstBucke', {
+      versioned: true,
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true
+    });
 
     // Ejemplo de posible integración entre S3 y SQS (opcional)
     // Puedes añadir una notificación para enviar mensajes a SQS cuando ocurran eventos en el bucket
