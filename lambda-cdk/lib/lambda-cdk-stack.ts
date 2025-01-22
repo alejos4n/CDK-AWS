@@ -9,7 +9,7 @@ export class LambdaCdkStack extends Stack {
     super(scope, id, props);
     
     const hello = new Function(this, 'HelloHandler', {
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_22_X,
       code: Code.fromAsset('lambda'),
       handler: 'hello.handler'
     });
