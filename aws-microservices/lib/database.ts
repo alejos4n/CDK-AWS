@@ -11,16 +11,16 @@ export class SwnDatabase extends Construct {
   constructor(scope, id) {
     super(scope, id);
 
-    // Product DynamoDB Table Creation
-    const productTable = new Table(this, "product", {
-      partitionKey: {
-        name: "id",
-        type: AttributeType.STRING,
-      },
-      tableName: "product",
-      removalPolicy: RemovalPolicy.DESTROY,
-      billingMode: BillingMode.PAY_PER_REQUEST,
-    });
+    // Definición de la tabla DynamoDB
+    const productTable = new Table(this, 'ProductTable', {
+        partitionKey: {
+          name: 'id',
+          type: AttributeType.STRING, // La clave primaria es de tipo STRING
+        },
+        tableName: 'product', // Nombre de la tabla
+        removalPolicy: RemovalPolicy.DESTROY, // Se elimina la tabla al destruir la pila
+        billingMode: BillingMode.PAY_PER_REQUEST, // Modo de facturación: pago por solicitud
+      });
 
     this.productTable = productTable;
   }
