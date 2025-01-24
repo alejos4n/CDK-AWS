@@ -1,46 +1,41 @@
-import { RemovalPolicy } from "aws-cdk-lib";
-import { AttributeType, BillingMode, ITable, Table } from "aws-cdk-lib/aws-dynamodb";
-import { Construct } from "constructs";
+import { Stack, StackProps } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { SwnApiGateway } from './apigateway';
+import { SwnDatabase } from './database';
+import { SwnEventBus } from './eventbus';
+import { SwnMicroservices } from './microservice';
+import { SwnQueue } from './queue';
 
-export class SwnDatabase extends Construct {
-  public readonly productTable: ITable;
-  public readonly basketTable: ITable;
+export class AwsMicroservicesStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
+    super(scope, id, props);
 
-  constructor(scope: Construct, id: string) {
-    super(scope, id);
+    // Create Database resources
+    const database = new SwnDatabase(this, 'Database');
 
-    // Product table
-    this.productTable = this.createProductTable();
-
-    // Basket table
-    this.basketTable = this.createBasketTable();
-  }
-
-  /**
-   * Creates the Product DynamoDB Table
-   * product : PK: id -- name - description - imageFile - price - category
-   */
-  private createProductTable(): ITable {
-    return new Table(this, "product", {
-      partitionKey: { name: "id", type: AttributeType.STRING },
-      tableName: "product",
-      removalPolicy: RemovalPolicy.DESTROY,
-      billingMode: BillingMode.PAY_PER_REQUEST,
+    // Create Microservices and pass database tables as props
+    const microservices = new SwnMicroservices(this, 'Microservices', {
+      productTable: database.productTable,
+      basketTable: database.basketTable,
+      orderTable: database.orderTable
     });
-  }
 
-  /**
-   * Creates the Basket DynamoDB Table
-   * basket : PK: userName -- items (SET-MAP object)
-   * item1 - { quantity - color - price - productId - productName }
-   * item2 - { quantity - color - price - productId - productName }
-   */
-  private createBasketTable(): ITable {
-    return new Table(this, "basket", {
-      partitionKey: { name: "userName", type: AttributeType.STRING },
-      tableName: "basket",
-      removalPolicy: RemovalPolicy.DESTROY,
-      billingMode: BillingMode.PAY_PER_REQUEST,
+    // Create API Gateway and link it to microservices
+    new SwnApiGateway(this, 'ApiGateway', {
+      productMicroservice: microservices.productMicroservice,
+      basketMicroservice: microservices.basketMicroservice,
+      orderingMicroservices: microservices.orderingMicroservice
+    });
+
+    // Create Queue and link it to the ordering microservice as a consumer
+    const queue = new SwnQueue(this, 'Queue', {
+      consumer: microservices.orderingMicroservice
+    });
+
+    // Create EventBus and set the publisher and target queue
+    new SwnEventBus(this, 'EventBus', {
+      publisherFuntion: microservices.basketMicroservice,
+      targetQueue: queue.orderQueue
     });
   }
 }
