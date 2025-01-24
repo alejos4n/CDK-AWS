@@ -11,7 +11,7 @@ interface SwnMicroservicesProps {
 export class SwnMicroservices extends Construct {
   public readonly productMicroservice: NodejsFunction;
 
-  constructor(scope, id, props: SwnMicroservicesProps) {
+  constructor(scope: Construct, id: string, props: SwnMicroservicesProps) {
     super(scope, id);
 
     // Lambda function configuration

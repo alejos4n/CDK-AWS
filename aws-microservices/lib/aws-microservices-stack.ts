@@ -5,7 +5,7 @@ import { SwnDatabase } from "./database";
 import { SwnMicroservices } from "./microservice";
 
 export class AwsMicroservicesStack extends Stack {
-  constructor(scope, id, props) {
+  constructor(scope: Construct, id: string, props: StackProps | undefined) {
     super(scope, id, props);
 
     // Initialize the database construct

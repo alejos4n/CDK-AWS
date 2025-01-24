@@ -8,7 +8,7 @@ export class SwnDatabase extends Construct {
    */
   productTable;
 
-  constructor(scope, id) {
+  constructor(scope: Construct, id: string) {
     super(scope, id);
 
     // Definición de la tabla DynamoDB
