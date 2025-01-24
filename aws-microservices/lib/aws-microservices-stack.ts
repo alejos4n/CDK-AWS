@@ -14,11 +14,13 @@ export class AwsMicroservicesStack extends Stack {
     // Initialize the microservices construct with dependencies
     const microservices = new SwnMicroservices(this, "Microservices", {
       productTable: database.productTable, // Pass the product table to microservices
+      basketTable: database.basketTable
     });
 
     // Initialize the API Gateway construct with dependencies
     new SwnApiGateway(this, "ApiGateway", {
       productMicroservice: microservices.productMicroservice, // Pass the product microservice to the API Gateway
+      basketMicroservice: microservices.basketMicroservice
     });
   }
 }
